@@ -139,19 +139,4 @@ class PicturePlugin(object):
     @pibooth.hookimpl
     def state_print_do(self, cfg, app, events):
         if app.find_capture_event(events):
-
-            with timeit("Moving the picture in the forget folder"):
-
-                for savedir in cfg.gettuple('GENERAL', 'directory', 'path'):
-                    forgetdir = osp.join(savedir, "forget")
-                    if not osp.isdir(forgetdir):
-                        os.makedirs(forgetdir)
-                    os.rename(osp.join(savedir, app.picture_filename), osp.join(forgetdir, app.picture_filename))
-
-            self._reset_vars(app)
             app.count.forgotten += 1
-            app.previous_picture = self.second_previous_picture
-
-            # Deactivate the print function for the backuped picture
-            # as we don't known how many times it has already been printed
-            app.count.remaining_duplicates = 0

@@ -8,6 +8,7 @@ from pibooth.language import get_translated_text
 
 ARROW_TOP = 'top'
 ARROW_BOTTOM = 'bottom'
+ARROW_SIDE = 'side'
 ARROW_HIDDEN = 'hidden'
 ARROW_TOUCH = 'touchscreen'
 
@@ -210,14 +211,15 @@ class IntroBackground(Background):
                 size = (self._rect.width * 0.3, self._rect.height * 0.3)
 
                 vflip = True if self.arrow_location == ARROW_TOP else False
-                self.left_arrow = pictures.get_pygame_image("arrow.png", size, vflip=vflip, color=self._text_color)
+                angle = 270 if self.arrow_location == ARROW_SIDE else 0
+                self.left_arrow = pictures.get_pygame_image("arrow.png", size, vflip=vflip, angle=angle, color=self._text_color)
 
-                x = int(self._rect.left + self._rect.width // 4
+                x = int(self._rect.left + self._rect.width // 8
                         - self.left_arrow.get_rect().width // 2)
                 if self.arrow_location == ARROW_TOP:
                     y = self._rect.top + 10
                 else:
-                    y = int(self._rect.top + 2 * self._rect.height // 3)
+                    y = int(self._rect.top + self._rect.height // 2)
 
             self.left_arrow_pos = (x - self.arrow_offset, y)
 
@@ -238,6 +240,11 @@ class IntroBackground(Background):
             rect = pygame.Rect(self._text_border, self._text_border,
                                self._rect.width / 2 - 2 * self._text_border,
                                self._rect.height * 0.4 - self._text_border)
+            align = 'bottom-center'
+        elif self.arrow_location == ARROW_SIDE:
+            rect = pygame.Rect(self._text_border, self._text_border,
+                               self._rect.width / 2 - 2 * self._text_border,
+                               self._rect.height * 0.5 - self._text_border)
             align = 'bottom-center'
         else:
             rect = pygame.Rect(self._text_border, self._rect.height * 0.4,
@@ -270,22 +277,22 @@ class IntroWithPrintBackground(IntroBackground):
     def resize(self, screen):
         IntroBackground.resize(self, screen)
         if self._need_update and self.arrow_location != ARROW_HIDDEN:
-            size = (self._rect.width * 0.1, self._rect.height * 0.1)
+            size = (self._rect.width * 0.25, self._rect.height * 0.25)
             if self.arrow_location == ARROW_TOUCH:
                 self.right_arrow = pictures.get_pygame_image("hand.png", size, hflip=False,
                                                              vflip=False, angle=-70, color=self._text_color)
             else:
                 vflip = True if self.arrow_location == ARROW_TOP else False
-                angle = -70 if self.arrow_location == ARROW_TOP else 70
+                angle = -70 if self.arrow_location == ARROW_TOP else 130
                 self.right_arrow = pictures.get_pygame_image("arrow.png", size, hflip=False,
                                                              vflip=vflip, angle=angle, color=self._text_color)
 
-            x = int(self._rect.left + self._rect.width // 2
-                    - self.right_arrow.get_rect().width // 2)
+            x = int(self._rect.right
+                    - self.right_arrow.get_rect().width * 1.1)
             if self.arrow_location == ARROW_TOP:
                 y = self._rect.top + 10
             else:
-                y = int(self._rect.bottom - self.right_arrow.get_rect().height * 1.1)
+                y = int(self._rect.bottom - self.right_arrow.get_rect().height)
             self.right_arrow_pos = (x - self.arrow_offset, y)
 
     def resize_texts(self):
@@ -295,12 +302,12 @@ class IntroWithPrintBackground(IntroBackground):
         text = get_translated_text("intro_print")
         if text:
             rect = pygame.Rect(self._rect.width * 0.30 + self._text_border, 0,
-                               self._rect.width * 0.20 - 2 * self._text_border,
-                               self._rect.height * 0.3 - 2 * self._text_border)
+                               self._rect.width *0.70 - 3 * self._text_border,
+                               self._rect.height * 0.2 - 2 * self._text_border)
             if self.arrow_location == ARROW_TOP:
-                rect.top = self._rect.height * 0.08
+                rect.top = self._rect.height * 0.06
             else:
-                rect.bottom = self._rect.height - self._rect.height * 0.08
+                rect.bottom = self._rect.height - self._rect.height * 0.06
             self._write_text(text, rect)
 
     def paint(self, screen):
@@ -499,34 +506,34 @@ class PrintBackground(Background):
                 size = (self._rect.width * 0.3, self._rect.height * 0.3)
 
                 vflip = True if self.arrow_location == ARROW_TOP else False
+                angle = 70 if self.arrow_location == ARROW_SIDE else 0
 
                 # Right arrow
                 self.right_arrow = pictures.get_pygame_image(
-                    "arrow.png", size, hflip=True, vflip=vflip, color=self._text_color)
+                    "arrow.png", size, hflip=True, vflip=vflip, angle=angle, color=self._text_color)
 
-                x = int(self._rect.left + self._rect.width * 0.75
-                        - self.right_arrow.get_rect().width // 2)
+                x = int(self._rect.right
+                        - self.right_arrow.get_rect().width)
                 if self.arrow_location == ARROW_TOP:
                     y = self._rect.top + 10
                 else:
-                    y = int(self._rect.top + 2 * self._rect.height // 3)
+                    y = int(self._rect.top + self._rect.height // 2 - self.right_arrow.get_rect().height // 2)
 
             self.right_arrow_pos = (x + self.arrow_offset, y)
 
             # Left arrow
-            size = (self._rect.width * 0.1, self._rect.height * 0.1)
+            size = (self._rect.width * 0.25, self._rect.height * 0.25)
 
             if self.arrow_location == ARROW_TOUCH:
                 self.left_arrow = pictures.get_pygame_image(
                     "hand.png", size, hflip=False, vflip=False, angle=70, color=self._text_color)
             else:
                 vflip = True if self.arrow_location == ARROW_TOP else False
-                angle = 70 if self.arrow_location == ARROW_TOP else -70
+                angle = 240
                 self.left_arrow = pictures.get_pygame_image(
                     "arrow.png", size, hflip=False, vflip=vflip, angle=angle, color=self._text_color)
 
-            x = int(self._rect.left + self._rect.width // 2
-                    - self.left_arrow.get_rect().width // 2)
+            x = self._rect.left
 
             if self.arrow_location == ARROW_TOP:
                 y = self._rect.top + 10
@@ -554,7 +561,7 @@ class PrintBackground(Background):
                                self._rect.height * 0.4 - self._text_border)
             align = 'bottom-center'
         else:
-            rect = pygame.Rect(self._rect.width / 2 + self._text_border, self._rect.height * 0.4,
+            rect = pygame.Rect(self._rect.width / 2 + self._text_border, self._rect.height * 0.2,
                                self._rect.width / 2 - 2 * self._text_border,
                                self._rect.height * 0.6 - self._text_border)
             align = 'top-center'
@@ -562,13 +569,13 @@ class PrintBackground(Background):
 
         text = get_translated_text("print_forget")
         if text:
-            rect = pygame.Rect(self._rect.width // 2, 0,
-                               self._rect.width // 5 - 2 * self._text_border,
-                               self._rect.height * 0.3 - 2 * self._text_border)
+            rect = pygame.Rect(self._rect.width * 0.15 + self._text_border, 0,
+                               self._rect.width * 0.40 - 3 * self._text_border,
+                               self._rect.height * 0.2 - 2 * self._text_border)
             if self.arrow_location == ARROW_TOP:
-                rect.top = self._rect.height * 0.08
+                rect.top = self._rect.height * 0.06
             else:
-                rect.bottom = self._rect.height - self._rect.height * 0.08
+                rect.bottom = self._rect.height - self._rect.height * 0.06
 
             self._write_text(text, rect)
 
